@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Link, RouteComponentProps, RouteProps } from "react-router-dom";
 import { firestoreConnect } from "react-redux-firebase";
+import BtnVolverAlListado from "../layout/buttons/BtnVolverAlListado";
 
 interface INuevoSuscriptorProps extends RouteComponentProps {
   firestore: any;
@@ -47,10 +48,7 @@ class NuevoSuscriptor extends React.Component<
     return (
       <div className="row">
         <div className="col-12 mb-4">
-          <Link to={`/suscriptores`} className="btn btn-primary">
-            <i className="fas fa-arrow-circle-left mr-2" />
-            Volver al Listado
-          </Link>
+          <BtnVolverAlListado path="/suscriptores" />
         </div>
         <div className="col-12">
           <h2>

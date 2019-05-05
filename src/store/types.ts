@@ -33,3 +33,13 @@ export interface ISuscriptor {
   carrera: string;
   codigo: string;
 }
+
+export interface ILibro {
+  id: string;
+  isbn: string;
+  autor: string;
+  titulo: string;
+  existencias: number;
+  prestados: any[];
+  editorial: string;
+}

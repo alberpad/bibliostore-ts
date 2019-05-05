@@ -5,6 +5,7 @@ import { firestoreConnect } from "react-redux-firebase";
 import { ISuscriptor, IState } from "../../store/types";
 import { RouteComponentProps, Link } from "react-router-dom";
 import Spinner from "../layout/Spinner";
+import BtnVolverAlListado from "../layout/buttons/BtnVolverAlListado";
 
 interface IMostrarSuscriptorProps extends RouteComponentProps<{ id: string }> {
   suscriptor: ISuscriptor;
@@ -27,10 +28,7 @@ const MostrarSuscriptor: React.FunctionComponent<
         </Link>
       </div> */}
       <div className="col-md-12 mb-4">
-        <Link to="/suscriptores" className="btn btn-primary">
-          <i className="fas fa-arrow-circle-left mr-2" />
-          Volver al listado
-        </Link>
+        <BtnVolverAlListado path="/suscriptores" />
         <Link
           to={`/suscriptores/editar/${suscriptor.id}`}
           className="btn btn-success ml-4"

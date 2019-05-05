@@ -4,15 +4,14 @@ import { reduxFirestore, firestoreReducer } from "redux-firestore";
 import { composeWithDevTools } from "redux-devtools-extension";
 import firebase from "firebase/app";
 import "firebase/firestore";
-import { FIREBASE_CONFIG } from "../../datasecure";
+import { FIREBASE_CONFIG } from "../datasecure";
+import { IState } from "./types";
 
 // CONFIGURACIÓN DE FIRESTORE
-const firebaseConfig = {
-  FIREBASE_CONFIG
-};
+// const firebaseConfig = FIREBASE_CONFIG;
 
 // INICIALIZAR FIREBASE
-firebase.initializeApp(firebaseConfig);
+firebase.initializeApp(FIREBASE_CONFIG);
 
 // CONFIGURACIÓN REACT-REDUX-FIRESTORE
 const rrfConfig = {

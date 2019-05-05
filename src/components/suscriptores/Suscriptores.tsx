@@ -44,7 +44,7 @@ const Suscriptores = (props: TCCSuscriptores) => {
   return (
     <div className="row">
       <div className="col-md-12 mb-4">
-        <Link to="/suscriptores/nuevo" className="btn btn-primary">
+        <Link to="/suscriptores/nuevo" className="btn btn-success">
           <i className="fas fa-plus mr-1" />
           Nuevo Suscriptor
         </Link>
