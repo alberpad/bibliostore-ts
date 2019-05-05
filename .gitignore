@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/datasecure
 /.pnp
 .pnp.js
 

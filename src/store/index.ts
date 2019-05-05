@@ -4,16 +4,11 @@ import { reduxFirestore, firestoreReducer } from "redux-firestore";
 import { composeWithDevTools } from "redux-devtools-extension";
 import firebase from "firebase/app";
 import "firebase/firestore";
+import { FIREBASE_CONFIG } from "../../datasecure";
 
 // CONFIGURACIÓN DE FIRESTORE
 const firebaseConfig = {
-  apiKey: "AIzaSyDp-oo5dLfNY22sIZHnDjhTonnhq1RABbk",
-  authDomain: "bibliostore-1857e.firebaseapp.com",
-  databaseURL: "https://bibliostore-1857e.firebaseio.com",
-  projectId: "bibliostore-1857e",
-  storageBucket: "bibliostore-1857e.appspot.com",
-  messagingSenderId: "835329418085",
-  appId: "1:835329418085:web:359848f04b4deddb"
+  FIREBASE_CONFIG
 };
 
 // INICIALIZAR FIREBASE
