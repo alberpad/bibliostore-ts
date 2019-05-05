@@ -44,7 +44,6 @@ class NuevoLibro extends React.Component<
       existencias: Number(existencias),
       prestados: []
     };
-    console.log(libro);
     const { firestore, history } = this.props;
     firestore.add({ collection: "libros" }, libro).then(() => {
       history.push("/libros");
