@@ -28,8 +28,8 @@ class EditarSuscriptor extends React.Component<
       nombre: props.suscriptor.nombre,
       apellido: props.suscriptor.apellido,
       carrera: props.suscriptor.carrera,
-      codigo: props.suscriptor.codigo,
-      id: props.suscriptor.id
+      codigo: props.suscriptor.codigo
+      // id: props.suscriptor.id
     };
   }
 
@@ -42,10 +42,10 @@ class EditarSuscriptor extends React.Component<
   handleOnSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const suscriptorActualizado = { ...this.state };
-    const { firestore, history } = this.props;
+    const { firestore, history, match } = this.props;
     firestore
       .update(
-        { collection: "suscriptores", doc: suscriptorActualizado.id },
+        { collection: "suscriptores", doc: match.params.id },
         suscriptorActualizado
       )
       .then(() => {
@@ -134,7 +134,7 @@ class EditarSuscriptor extends React.Component<
   }
 }
 
-export default compose<React.FunctionComponent<IEditarSuscriptorProps>>(
+export default compose<React.FunctionComponent<IEditarSuscriptorProps & any>>(
   firestoreConnect((props: IEditarSuscriptorProps) => [
     {
       collection: "suscriptores",

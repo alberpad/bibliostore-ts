@@ -23,7 +23,7 @@ class EditarLibro extends React.Component<
       autor: props.libro.autor,
       editorial: props.libro.editorial,
       existencias: props.libro.existencias,
-      id: props.libro.id,
+      // id: props.libro.id,
       prestados: props.libro.prestados,
       isbn: props.libro.isbn
     };
@@ -38,12 +38,9 @@ class EditarLibro extends React.Component<
   handleOnSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const libroActualizado = { ...this.state };
-    const { firestore, history } = this.props;
+    const { firestore, history, match } = this.props;
     firestore
-      .update(
-        { collection: "libros", doc: libroActualizado.id },
-        libroActualizado
-      )
+      .update({ collection: "libros", doc: match.params.id }, libroActualizado)
       .then(() => {
         history.push("/libros");
       });
@@ -146,7 +143,7 @@ class EditarLibro extends React.Component<
   }
 }
 
-export default compose<React.FunctionComponent<IEditarLibroProps>>(
+export default compose<React.FunctionComponent<IEditarLibroProps & any>>(
   firestoreConnect((props: IEditarLibroProps) => [
     {
       collection: "libros",

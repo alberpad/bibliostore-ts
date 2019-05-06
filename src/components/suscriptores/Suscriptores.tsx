@@ -102,7 +102,7 @@ const Suscriptores = (props: TCCSuscriptores) => {
 
 // CONEXIÓN A FIRESTORE Y PASO DE PROPS CON REDUX CONNECT Y COMPOSE
 // TIPADO >> https://stackoverflow.com/questions/50001344/using-react-redux-connect-with-typescript
-export default compose<React.FunctionComponent<TCCSuscriptores>>(
+export default compose<React.FunctionComponent<TCCSuscriptores & any>>(
   firestoreConnect([{ collection: "suscriptores" }]), //Crea un HOC, inyecta firestore
   connect((state: IState, props) => ({
     suscriptores: state.firestore.ordered.suscriptores

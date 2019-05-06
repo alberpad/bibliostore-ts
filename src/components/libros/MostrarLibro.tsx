@@ -1,17 +1,18 @@
-import React from 'react';
-import { compose } from 'redux';
-import { connect } from 'react-redux';
-import { firestoreConnect } from 'react-redux-firebase';
-import { ILibro, IState } from '../../store/types';
-import { RouteComponentProps, Link } from 'react-router-dom';
-import Spinner from '../layout/Spinner';
-import BtnVolverAlListado from '../layout/buttons/BtnVolverAlListado';
+import React from "react";
+import { compose } from "redux";
+import { connect } from "react-redux";
+import { firestoreConnect } from "react-redux-firebase";
+import { ILibro, IState } from "../../store/types";
+import { RouteComponentProps, Link } from "react-router-dom";
+import Spinner from "../layout/Spinner";
+import BtnVolverAlListado from "../layout/buttons/BtnVolverAlListado";
 
 interface IMostrarLibroProps extends RouteComponentProps<{ id: string }> {
   libro: ILibro;
+  firestore: any;
 }
 
-const MostrarLibro: React.FunctionComponent<IMostrarLibroProps> = (props) => {
+const MostrarLibro: React.FunctionComponent<IMostrarLibroProps> = props => {
   const { libro } = props;
   if (!libro) return <Spinner />;
   let btnPrestamo = null;
@@ -27,7 +28,21 @@ const MostrarLibro: React.FunctionComponent<IMostrarLibroProps> = (props) => {
     );
   }
 
-  const handleOnClickDevolverLibro = (codigo: string) => {};
+  const handleOnClickDevolverLibro = (codigo: string) => {
+    const { firestore } = props;
+    const libroTemp = { ...props.libro };
+    const prestados = libroTemp.prestados.filter(
+      elemento => elemento.suscriptor.codigo !== codigo
+    );
+    libroTemp.prestados = prestados;
+    firestore.update(
+      {
+        collection: "libros",
+        doc: libroTemp.id
+      },
+      libroTemp
+    );
+  };
 
   return (
     <div className="row">
@@ -74,7 +89,7 @@ const MostrarLibro: React.FunctionComponent<IMostrarLibroProps> = (props) => {
           {libro.existencias - libro.prestados.length}
         </p>
         <h3 className="my-6 mb-2">Suscriptores que tiene el libro prestado:</h3>
-        {libro.prestados.map((prestado) => (
+        {libro.prestados.map(prestado => (
           <div key={prestado.suscriptor.codigo} className="card my-2">
             <h4 className="card-header">
               {prestado.suscriptor.nombre} {prestado.suscriptor.apellido}
@@ -98,7 +113,7 @@ const MostrarLibro: React.FunctionComponent<IMostrarLibroProps> = (props) => {
                 type="button"
                 className="btn btn-success font-weight-bold"
                 onClick={() =>
-                  this.handleOnClickDevolverLibro(prestado.suscriptor.codigo)
+                  handleOnClickDevolverLibro(prestado.suscriptor.codigo)
                 }
               >
                 Devolver Libro
@@ -118,11 +133,11 @@ const MostrarLibro: React.FunctionComponent<IMostrarLibroProps> = (props) => {
   );
 };
 
-export default compose<React.FunctionComponent<IMostrarLibroProps>>(
+export default compose<React.FunctionComponent<IMostrarLibroProps & any>>(
   firestoreConnect((props: IMostrarLibroProps) => [
     {
-      collection: 'libros',
-      storeAs: 'libro', //alias para evitar que se sobreescriba Libroes del state
+      collection: "libros",
+      storeAs: "libro", //alias para evitar que se sobreescriba Libroes del state
       doc: props.match.params.id
     }
   ]),

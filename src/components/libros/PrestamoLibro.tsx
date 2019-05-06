@@ -1,104 +1,119 @@
-import React from 'react';
-import { compose } from 'redux';
-import { connect } from 'react-redux';
-import { firestoreConnect } from 'react-redux-firebase';
-import { ILibro, IState } from '../../store/types';
-import { RouteComponentProps, Link } from 'react-router-dom';
-import Spinner from '../layout/Spinner';
-import { ISuscriptor, IPrestamoLibro } from '../../store/types';
-import { FichaSuscriptor } from '../suscriptores/FichaSuscriptor';
+import React from "react";
+import { compose } from "redux";
+import { connect } from "react-redux";
+import { firestoreConnect } from "react-redux-firebase";
+import { ILibro, IState } from "../../store/types";
+import { RouteComponentProps, Link } from "react-router-dom";
+import Spinner from "../layout/Spinner";
+import { ISuscriptor, IPrestamoLibro } from "../../store/types";
+import { FichaSuscriptor } from "../suscriptores/FichaSuscriptor";
+import Swal from "sweetalert2";
+// REDUX ACTIONS
+import { buscarUsuario } from "../../store/actions/buscarUsuarioActions";
 
 export interface IPrestamoLibroProps
   extends RouteComponentProps<{ id: string }> {
   libro: ILibro;
   firestore: any;
+  buscarUsuario: (usuario: ISuscriptor) => void;
+  suscriptor: ISuscriptor;
 }
 
 export interface IPrestamoLibroState {
   busqueda: string;
-  suscriptor: ISuscriptor;
   noSuscriptor: boolean;
 }
 
 class PrestamoLibro extends React.Component<
   IPrestamoLibroProps,
-  IPrestamoLibroState
+  Partial<IPrestamoLibroState>
 > {
   constructor(props: IPrestamoLibroProps) {
     super(props);
 
     this.state = {
       noSuscriptor: false,
-      busqueda: '',
-      suscriptor: {
-        nombre: '',
-        apellido: '',
-        carrera: '',
-        codigo: '',
-        id: ''
-      }
+      busqueda: ""
     };
   }
 
   handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({
-      // [e.target.name]: e.target.value
-      busqueda: e.target.value
+      [e.target.name]: e.target.value
+      // busqueda: e.target.value
     });
   };
 
   handleOnSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const { busqueda } = this.state;
-    const { firestore, history } = this.props;
-    const coleccion = firestore.collection('suscriptores');
-    const consulta = coleccion.where('codigo', '==', busqueda).get();
+    const { firestore, buscarUsuario } = this.props;
+    const coleccion = firestore.collection("suscriptores");
+    const consulta = coleccion.where("codigo", "==", busqueda).get();
     consulta.then((resultado: any) => {
       if (resultado.empty) {
+        buscarUsuario({
+          apellido: "",
+          carrera: "",
+          codigo: "",
+          nombre: "",
+          id: ""
+        });
         this.setState({
-          noSuscriptor: true,
-          suscriptor: {
-            nombre: '',
-            apellido: '',
-            carrera: '',
-            codigo: '',
-            id: ''
-          }
+          noSuscriptor: true
+        });
+        Swal.fire({
+          type: "error",
+          title: "No Encontrado",
+          text: "El código no corresponde a ningún suscriptor"
         });
       } else {
         const datos = resultado.docs[0];
-        console.log(datos.data());
+        buscarUsuario(datos.data());
         this.setState({
-          noSuscriptor: false,
-          suscriptor: datos.data()
+          noSuscriptor: false
         });
       }
     });
   };
 
   handleOnClickSolicitar = () => {
-    const { suscriptor } = this.state;
+    const { suscriptor, firestore, history, match } = this.props;
     const prestamoLibro: IPrestamoLibro = {
       suscriptor,
       fecha_solicitud: new Date().toLocaleDateString()
     };
-    const { firestore, history, libro } = this.props;
-    libro.prestados.push(prestamoLibro);
+
+    // ASÍ DE ERROR: EL OBJETO NO ES EXTENSIBLE
+    // ESTO ES POR LAS PROPS NO SE PUEDEN MUTAR
+    // const { firestore, history, libro } = this.props;
+    // libro.prestados.push(prestamoLibro);
+    // SOLUCION: HACER UNA COPIA DEL ARREGLO PRESTADOS Y AÑADIR AHÍ
+
+    let prestados = [];
+    prestados = [...this.props.libro.prestados, prestamoLibro];
+    const libro = { ...this.props.libro };
+    delete libro.prestados;
+    const id = libro.id;
+    delete libro.id;
+    libro.prestados = prestados;
+    console.log(libro);
     firestore
       .update(
         {
-          collection: 'libros',
-          doc: libro.id
+          collection: "libros",
+          doc: id
         },
         libro
       )
-      .then(history.push('/libros'));
+      .then(history.push("/libros"));
   };
 
   public render() {
     const { libro } = this.props;
     if (!libro) return <Spinner />;
-    const { noSuscriptor, suscriptor } = this.state;
+    const { suscriptor } = this.props;
+
     let fichaAlumno, btnSolicitar;
     if (suscriptor && suscriptor.nombre) {
       fichaAlumno = <FichaSuscriptor alumno={suscriptor} />;
@@ -161,15 +176,19 @@ class PrestamoLibro extends React.Component<
   }
 }
 
-export default compose<React.FunctionComponent<IPrestamoLibroProps>>(
+export default compose<React.FunctionComponent<IPrestamoLibroProps & any>>(
   firestoreConnect((props: IPrestamoLibroProps) => [
     {
-      collection: 'libros',
-      storeAs: 'libro', //alias para evitar que se sobreescriba suscriptores del state
+      collection: "libros",
+      storeAs: "libro", //alias para evitar que se sobreescriba libros del state
       doc: props.match.params.id
     }
   ]),
-  connect((state: IState, props) => ({
-    libro: state.firestore.ordered.libro && state.firestore.ordered.libro[0] //este ordered.suscriptor es por el alia porque en realiad retorna suscriptores pero con uno solo
-  }))
+  connect(
+    (state: IState, props) => ({
+      libro: state.firestore.ordered.libro && state.firestore.ordered.libro[0],
+      suscriptor: state.suscriptor
+    }),
+    { buscarUsuario }
+  )
 )(PrestamoLibro);

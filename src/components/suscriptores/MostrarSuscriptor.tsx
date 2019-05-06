@@ -61,7 +61,7 @@ const MostrarSuscriptor: React.FunctionComponent<
   );
 };
 
-export default compose<React.FunctionComponent<IMostrarSuscriptorProps>>(
+export default compose<React.FunctionComponent<IMostrarSuscriptorProps & any>>(
   firestoreConnect((props: IMostrarSuscriptorProps) => [
     {
       collection: "suscriptores",

@@ -1,18 +1,21 @@
 import * as React from "react";
-import { Link, RouteComponentProps, RouteProps } from "react-router-dom";
+import { RouteComponentProps } from "react-router-dom";
 import { firestoreConnect } from "react-redux-firebase";
 import BtnVolverAlListado from "../layout/buttons/BtnVolverAlListado";
+import { ISuscriptor } from "../../store/types";
 
 interface INuevoSuscriptorProps extends RouteComponentProps {
   firestore: any;
 }
 
-interface INuevoSuscriptorState {
-  nombre: string;
-  apellido: string;
-  carrera: string;
-  codigo: string;
-}
+// interface INuevoSuscriptorState {
+//   nombre: string;
+//   apellido: string;
+//   carrera: string;
+//   codigo: string;
+// }
+
+interface INuevoSuscriptorState extends ISuscriptor {}
 
 class NuevoSuscriptor extends React.Component<
   INuevoSuscriptorProps & RouteComponentProps,

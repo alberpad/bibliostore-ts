@@ -3,9 +3,12 @@ import { reactReduxFirebase, firebaseReducer } from "react-redux-firebase";
 import { reduxFirestore, firestoreReducer } from "redux-firestore";
 import { composeWithDevTools } from "redux-devtools-extension";
 import firebase from "firebase/app";
+import "firebase/auth"; //Habilida la autenticación de firebase en al aplicación
 import "firebase/firestore";
 import { FIREBASE_CONFIG } from "../datasecure";
 import { IState } from "./types";
+//CUSTOMS REDUCERS
+import buscarUsuarioReducer from "./reducers/buscarUsuarioReducer";
 
 // CONFIGURACIÓN DE FIRESTORE
 // const firebaseConfig = FIREBASE_CONFIG;
@@ -29,7 +32,8 @@ const createStoreWithFirebase = compose<React.ComponentClass>(
 // REDUCERS
 const rootReducer = combineReducers({
   firebase: firebaseReducer,
-  firestore: firestoreReducer
+  firestore: firestoreReducer,
+  suscriptor: buscarUsuarioReducer
 });
 
 // STATE INICIAL

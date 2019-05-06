@@ -1,6 +1,7 @@
 export interface IState {
   firestore: IFirestore;
   firebase: IFirebase;
+  suscriptor: ISuscriptor;
 }
 
 interface IFirestore {

@@ -5,7 +5,7 @@ import Suscriptores from "./components/suscriptores/Suscriptores";
 import MostrarSuscriptor from "./components/suscriptores/MostrarSuscriptor";
 import EditarSuscriptor from "./components/suscriptores/EditarSuscriptor";
 import NuevoSuscriptor from "./components/suscriptores/NuevoSuscriptor";
-import { Navbar } from "./components/layout/Navbar";
+import Navbar from "./components/layout/Navbar";
 import store from "./store";
 import { Provider } from "react-redux";
 import Libros from "./components/libros/Libros";
@@ -13,6 +13,10 @@ import MostrarLibro from "./components/libros/MostrarLibro";
 import NuevoLibro from "./components/libros/NuevoLibro";
 import EditarLibro from "./components/libros/EditarLibro";
 import PrestamoLibro from "./components/libros/PrestamoLibro";
+import Login from "./components/auth/Login";
+
+//Protección de autenciación para las rutas
+import { UserIsAuthenticated, UserIsNotAuthenticated } from "./helpers/auth";
 
 const App: React.FC = () => {
   return (
@@ -21,31 +25,56 @@ const App: React.FC = () => {
         <Navbar />
         <div className="container">
           <Switch>
-            <Route exact path="/" component={Libros} />
-            <Route exact path="/libros" component={Libros} />
-            <Route exact path="/libros/mostrar/:id" component={MostrarLibro} />
-            <Route exact path="/libros/nuevo" component={NuevoLibro} />
-            <Route exact path="/libros/editar/:id" component={EditarLibro} />
+            <Route
+              exact
+              path="/login"
+              component={UserIsNotAuthenticated(Login)}
+            />
+            <Route exact path="/" component={UserIsAuthenticated(Libros)} />
+            <Route
+              exact
+              path="/libros"
+              component={UserIsAuthenticated(Libros)}
+            />
+            <Route
+              exact
+              path="/libros/mostrar/:id"
+              component={UserIsAuthenticated(MostrarLibro)}
+            />
+            <Route
+              exact
+              path="/libros/nuevo"
+              component={UserIsAuthenticated(NuevoLibro)}
+            />
+            <Route
+              exact
+              path="/libros/editar/:id"
+              component={UserIsAuthenticated(EditarLibro)}
+            />
             <Route
               exact
               path="/libros/prestamo/:id"
-              component={PrestamoLibro}
+              component={UserIsAuthenticated(PrestamoLibro)}
             />
-            <Route exact path="/suscriptores" component={Suscriptores} />
+            <Route
+              exact
+              path="/suscriptores"
+              component={UserIsAuthenticated(Suscriptores)}
+            />
             <Route
               exact
               path="/suscriptores/nuevo"
-              component={NuevoSuscriptor}
+              component={UserIsAuthenticated(NuevoSuscriptor)}
             />
             <Route
               exact
               path="/suscriptores/mostrar/:id"
-              component={MostrarSuscriptor}
+              component={UserIsAuthenticated(MostrarSuscriptor)}
             />
             <Route
               exact
               path="/suscriptores/editar/:id"
-              component={EditarSuscriptor}
+              component={UserIsAuthenticated(EditarSuscriptor)}
             />
           </Switch>
         </div>
