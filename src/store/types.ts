@@ -40,6 +40,11 @@ export interface ILibro {
   autor: string;
   titulo: string;
   existencias: number;
-  prestados: any[];
+  prestados: IPrestamoLibro[];
   editorial: string;
+}
+
+export interface IPrestamoLibro {
+  suscriptor: ISuscriptor;
+  fecha_solicitud: string;
 }

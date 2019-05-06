@@ -1,12 +1,12 @@
-import React from "react";
-import { compose } from "redux";
-import { connect } from "react-redux";
-import { firestoreConnect } from "react-redux-firebase";
-import { ILibro, IState } from "../../store/types";
-import { RouteComponentProps, Link } from "react-router-dom";
-import Spinner from "../layout/Spinner";
-import { ISuscriptor } from "../../store/types";
-import { FichaSuscriptor } from "../suscriptores/FichaSuscriptor";
+import React from 'react';
+import { compose } from 'redux';
+import { connect } from 'react-redux';
+import { firestoreConnect } from 'react-redux-firebase';
+import { ILibro, IState } from '../../store/types';
+import { RouteComponentProps, Link } from 'react-router-dom';
+import Spinner from '../layout/Spinner';
+import { ISuscriptor, IPrestamoLibro } from '../../store/types';
+import { FichaSuscriptor } from '../suscriptores/FichaSuscriptor';
 
 export interface IPrestamoLibroProps
   extends RouteComponentProps<{ id: string }> {
@@ -16,27 +16,34 @@ export interface IPrestamoLibroProps
 
 export interface IPrestamoLibroState {
   busqueda: string;
-  suscriptor: Partial<ISuscriptor>;
+  suscriptor: ISuscriptor;
   noSuscriptor: boolean;
 }
 
 class PrestamoLibro extends React.Component<
   IPrestamoLibroProps,
-  Partial<IPrestamoLibroState>
+  IPrestamoLibroState
 > {
   constructor(props: IPrestamoLibroProps) {
     super(props);
 
     this.state = {
       noSuscriptor: false,
-      busqueda: "",
-      suscriptor: {}
+      busqueda: '',
+      suscriptor: {
+        nombre: '',
+        apellido: '',
+        carrera: '',
+        codigo: '',
+        id: ''
+      }
     };
   }
 
   handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({
-      [e.target.name]: e.target.value
+      // [e.target.name]: e.target.value
+      busqueda: e.target.value
     });
   };
 
@@ -44,13 +51,19 @@ class PrestamoLibro extends React.Component<
     e.preventDefault();
     const { busqueda } = this.state;
     const { firestore, history } = this.props;
-    const coleccion = firestore.collection("suscriptores");
-    const consulta = coleccion.where("codigo", "==", busqueda).get();
+    const coleccion = firestore.collection('suscriptores');
+    const consulta = coleccion.where('codigo', '==', busqueda).get();
     consulta.then((resultado: any) => {
       if (resultado.empty) {
         this.setState({
           noSuscriptor: true,
-          suscriptor: {}
+          suscriptor: {
+            nombre: '',
+            apellido: '',
+            carrera: '',
+            codigo: '',
+            id: ''
+          }
         });
       } else {
         const datos = resultado.docs[0];
@@ -65,6 +78,21 @@ class PrestamoLibro extends React.Component<
 
   handleOnClickSolicitar = () => {
     const { suscriptor } = this.state;
+    const prestamoLibro: IPrestamoLibro = {
+      suscriptor,
+      fecha_solicitud: new Date().toLocaleDateString()
+    };
+    const { firestore, history, libro } = this.props;
+    libro.prestados.push(prestamoLibro);
+    firestore
+      .update(
+        {
+          collection: 'libros',
+          doc: libro.id
+        },
+        libro
+      )
+      .then(history.push('/libros'));
   };
 
   public render() {
@@ -136,8 +164,8 @@ class PrestamoLibro extends React.Component<
 export default compose<React.FunctionComponent<IPrestamoLibroProps>>(
   firestoreConnect((props: IPrestamoLibroProps) => [
     {
-      collection: "libros",
-      storeAs: "libro", //alias para evitar que se sobreescriba suscriptores del state
+      collection: 'libros',
+      storeAs: 'libro', //alias para evitar que se sobreescriba suscriptores del state
       doc: props.match.params.id
     }
   ]),
