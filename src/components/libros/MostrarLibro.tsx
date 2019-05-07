@@ -7,6 +7,7 @@ import { RouteComponentProps, Link } from "react-router-dom";
 import Spinner from "../layout/Spinner";
 import BtnVolverAlListado from "../layout/buttons/BtnVolverAlListado";
 
+
 interface IMostrarLibroProps extends RouteComponentProps<{ id: string }> {
   libro: ILibro;
   firestore: any;

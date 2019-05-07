@@ -1,15 +1,15 @@
-import React from "react";
-import { compose } from "redux";
-import { connect } from "react-redux";
-import { firestoreConnect } from "react-redux-firebase";
-import { ILibro, IState } from "../../store/types";
-import { RouteComponentProps, Link } from "react-router-dom";
-import Spinner from "../layout/Spinner";
-import { ISuscriptor, IPrestamoLibro } from "../../store/types";
-import { FichaSuscriptor } from "../suscriptores/FichaSuscriptor";
-import Swal from "sweetalert2";
+import React from 'react';
+import { compose } from 'redux';
+import { connect } from 'react-redux';
+import { firestoreConnect } from 'react-redux-firebase';
+import { ILibro, IState } from '../../store/types';
+import { RouteComponentProps, Link } from 'react-router-dom';
+import Spinner from '../layout/Spinner';
+import { ISuscriptor, IPrestamoLibro } from '../../store/types';
+import { FichaSuscriptor } from '../suscriptores/FichaSuscriptor';
+import Swal from 'sweetalert2';
 // REDUX ACTIONS
-import { buscarUsuario } from "../../store/actions/buscarUsuarioActions";
+import { buscarUsuario } from '../../store/actions/buscarUsuarioActions';
 
 export interface IPrestamoLibroProps
   extends RouteComponentProps<{ id: string }> {
@@ -33,7 +33,7 @@ class PrestamoLibro extends React.Component<
 
     this.state = {
       noSuscriptor: false,
-      busqueda: ""
+      busqueda: ''
     };
   }
 
@@ -48,28 +48,31 @@ class PrestamoLibro extends React.Component<
     e.preventDefault();
     const { busqueda } = this.state;
     const { firestore, buscarUsuario } = this.props;
-    const coleccion = firestore.collection("suscriptores");
-    const consulta = coleccion.where("codigo", "==", busqueda).get();
+    const coleccion = firestore.collection('suscriptores');
+    const consulta = coleccion.where('codigo', '==', busqueda).get();
+
     consulta.then((resultado: any) => {
       if (resultado.empty) {
         buscarUsuario({
-          apellido: "",
-          carrera: "",
-          codigo: "",
-          nombre: "",
-          id: ""
+          apellido: '',
+          carrera: '',
+          codigo: '',
+          nombre: '',
+          id: ''
         });
         this.setState({
           noSuscriptor: true
         });
         Swal.fire({
-          type: "error",
-          title: "No Encontrado",
-          text: "El código no corresponde a ningún suscriptor"
+          type: 'error',
+          title: 'No Encontrado',
+          text: 'El código no corresponde a ningún suscriptor'
         });
       } else {
-        const datos = resultado.docs[0];
-        buscarUsuario(datos.data());
+        const id = resultado.docs[0].id;
+        const suscriptor = resultado.docs[0].data();
+        suscriptor.id = id;
+        buscarUsuario(suscriptor);
         this.setState({
           noSuscriptor: false
         });
@@ -97,16 +100,15 @@ class PrestamoLibro extends React.Component<
     const id = libro.id;
     delete libro.id;
     libro.prestados = prestados;
-    console.log(libro);
     firestore
       .update(
         {
-          collection: "libros",
+          collection: 'libros',
           doc: id
         },
         libro
       )
-      .then(history.push("/libros"));
+      .then(history.push('/libros'));
   };
 
   public render() {
@@ -179,8 +181,8 @@ class PrestamoLibro extends React.Component<
 export default compose<React.FunctionComponent<IPrestamoLibroProps & any>>(
   firestoreConnect((props: IPrestamoLibroProps) => [
     {
-      collection: "libros",
-      storeAs: "libro", //alias para evitar que se sobreescriba libros del state
+      collection: 'libros',
+      storeAs: 'libro', //alias para evitar que se sobreescriba libros del state
       doc: props.match.params.id
     }
   ]),
